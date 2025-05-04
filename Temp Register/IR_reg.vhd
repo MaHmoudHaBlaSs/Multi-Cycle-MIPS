@@ -5,9 +5,8 @@ use ieee.numeric_std.all;
 
 entity IR_reg is
 	port (
-		clk,enable: in std_logic;
+		clk,reset,enable: in std_logic;
 		IR_in   : in std_logic_vector(31 downto 0);
-		
 		Op_code: out std_logic_vector(31 downto 26);
 		rs: out std_logic_vector(25 downto 21);
 		rt: out std_logic_vector(20 downto 16);
@@ -20,9 +19,15 @@ signal rd:std_logic_vector(4 downto 0);
 signal funct:std_logic_vector(5 downto 0);
 signal jump_address:std_logic_vector(25 downto 0);
 begin
-	process(clk)
+	process(clk,reset)
 	begin
-		if(rising_edge(clk)) then
+		if (reset = '1') then
+			Op_code <= (others =>'0');
+			rs <= (others =>'0');
+			rt <= (others =>'0');
+			immediate <= (others =>'0');
+			
+		elsif(rising_edge(clk)) then
 			if(enable ='1') then
 				Op_code <= IR_in(31 downto 26);
 				rs <= IR_in(25 downto 21);
@@ -36,6 +41,5 @@ begin
 		end if;
 		
 	end process;
-	
-	
+		
 end architecture ;
