@@ -83,6 +83,15 @@ package MIPS_Package is
     );
 	end component;
 	
+	--ALUOut
+	component ALUOut is
+	port (
+		clk : in std_logic;
+		reg_in   : in std_logic_vector(31 downto 0);
+		reg_out  : out std_logic_vector(31 downto 0)
+		);
+	end component;
+	
 	-- MDR
 	component MDR is
 	port (
@@ -117,6 +126,16 @@ package MIPS_Package is
 		WriteData: in std_logic_vector(31 downto 0);
 		ReadData1,ReadData2: out std_logic_vector(31 downto 0)
 		);
+	end component;
+	
+	component RegisterAB is
+    Port (
+        clk    : in STD_LOGIC;
+        AIn    : in STD_LOGIC_VECTOR(31 downto 0);
+        BIn    : in STD_LOGIC_VECTOR(31 downto 0);
+        AOut   : out STD_LOGIC_VECTOR(31 downto 0);
+        BOut   : out STD_LOGIC_VECTOR(31 downto 0)
+    );
 	end component;
 	
 	-- Memory

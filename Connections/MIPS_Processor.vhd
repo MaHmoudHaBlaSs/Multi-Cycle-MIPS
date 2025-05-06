@@ -56,15 +56,22 @@ architecture Behavioral of MIPS_Processor is
 	-- program counter
 	signal PC_in  : std_logic_vector(31 downto 0);
     signal PC_out : std_logic_vector(31 downto 0);
-	signal PC_enable : std_logic;
+	signal PC_enable : std_logic;	
+	
+	--RegisterAB
+	signal data_A: STD_LOGIC_VECTOR(31 downto 0);
+	signal data_B: STD_LOGIC_VECTOR(31 downto 0);
 	
 	-- ALU , ALU control
 	signal alu_inA: STD_LOGIC_VECTOR(31 downto 0);
     signal alu_inB: STD_LOGIC_VECTOR(31 downto 0);
-	signal alu_out: STD_LOGIC_VECTOR(31 downto 0);
+	signal alu_result: STD_LOGIC_VECTOR(31 downto 0);
     signal alu_zero: STD_LOGIC;
 	
-	signal alu_control_out: STD_LOGIC_VECTOR(2 downto 0); 
+	signal alu_control_out: STD_LOGIC_VECTOR(2 downto 0);
+	
+	--ALUOut
+	signal alu_out: STD_LOGIC_VECTOR(31 downto 0);
 	
 	-- memory data register
 	signal MDR_out: std_logic_vector(31 downto 0);
@@ -90,7 +97,7 @@ begin
 	
 	-- memory
 	memory_component: Memory 
-	port map( clk , memory_address , ReadData2 , Memwrite , MemRead ,memory_dataOut);
+	port map( clk , memory_address , data_B , Memwrite , MemRead ,memory_dataOut);
 
 	-- IR_reg
     IR_reg_component: IR_reg
@@ -114,11 +121,11 @@ begin
 	
 	-- alu
 	alu_component: alu
-    Port map(alu_inA , alu_inB , alu_control_out , alu_out , alu_zero);
+    Port map(alu_inA , alu_inB , alu_control_out , alu_result , alu_zero);
 	
-	
-	
-	
+	--ALUOut
+	ALUOut_component :ALUOut 
+	port map( clk , alu_result , alu_out);
 	
 	
 	
@@ -143,16 +150,16 @@ begin
 	--ALU MUX ( A )
 	ALUMux_A : MUX2_1_nBit
 	generic map(32)
-	port map(a => PC_out  , b => ReadData1  , sel => ALUSrcA  , output => alu_inA );
+	port map(a => PC_out  , b => data_A  , sel => ALUSrcA  , output => alu_inA );
 	
 	--ALU MUX ( B )
 	ALUMux_B : mux4_1 
-	port map(a => ReadData2 , b => X"00000004" , c=> signExtend_out , d => signExtend_out_shifted,
+	port map(a => data_B , b => X"00000004" , c=> signExtend_out , d => signExtend_out_shifted,
 	sel => 	ALUSrcB , output => alu_inB );
 	
-	--ALU Out MUX
-	ALUOutMUX: Mux3_1 
-    Port map( a=> alu_out , b=> alu_out , c=> jump_address , sel=> PCSource , output=> PC_in); 
+	--PC_in MUX
+	PC_in_MUX: Mux3_1 
+    Port map( a=> alu_result , b=> alu_out , c=> jump_address , sel=> PCSource , output=> PC_in); 
 	
 	
 	
