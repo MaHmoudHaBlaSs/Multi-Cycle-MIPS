@@ -1,9 +1,7 @@
-library ieee;
-use ieee.std_logic_1164.all;
-use ieee.numeric_std.all;
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;	
 
-
-entity MDR is
+entity ALUOut is
 	port (
 		clk : in std_logic;
 		reg_in   : in std_logic_vector(31 downto 0);
@@ -11,7 +9,7 @@ entity MDR is
 		);
 end entity;
 
-architecture reg of MDR is
+architecture reg of ALUOut is
 signal temp : std_logic_vector(31 downto 0) := (others => '0');
 begin
 	process(clk)
