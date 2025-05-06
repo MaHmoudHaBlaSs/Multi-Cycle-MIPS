@@ -6,9 +6,9 @@ use IEEE.numeric_std.all;
 entity Memory is 
 	port (
         clk: in std_logic;
-	-- We only have 256 address available so 8 bits would be enough
+        -- We only have 2048 address available so 11 bits would be enough
         -- But we use 32 bit because we are dealing with other registers and gates
-        -- that works with 32-bit format.
+        -- that work with 32-bit format.
         address : in std_logic_vector(31 downto 0);
         dataIn : in std_logic_vector(31 downto 0); -- Data to write [used only with "SW"]
 
@@ -21,20 +21,31 @@ entity Memory is
 	);
 					   			   
 end entity;
--- Our Memory is a simple array of 256 words of 32 bits each
+-- Our Memory is a simple array of 2048 8-bits words [Byte]
 architecture Behavioral of Memory is
-    type memArray is array(0 to 255) of std_logic_vector(31 downto 0); -- Creating custom type
+    type memArray is array(0 to 2047) of std_logic_vector(7 downto 0); -- Creating custom type
     signal Memory: memArray := (others => (others => '0')); -- Creating an instance of that type
 
     begin
         process (clk) -- When clk change (rising or falling)
+            variable addr_ind : Integer; 
         begin
             if (rising_edge(clk)) then -- If that change was an uprising edge
-                if (MemRead = '1') then
-                    dataOut <= Memory(to_integer(unsigned(address(7 downto 0)))); -- Fetch data from address
-                elsif (MemWrite = '1') then
-                    Memory(to_integer(unsigned(address(7 downto 0)))) <= dataIn; -- Store data in address 
+                addr_ind := to_integer(unsigned(address));
+
+                if (MemRead = '1') then -- Fetch data from address
+                    dataOut(31 downto 24) <= Memory(addr_ind); 
+                    dataOut(23 downto 16) <= Memory(addr_ind+1); 
+                    dataOut(15 downto 8)  <= Memory(addr_ind+2); 
+                    dataOut(7 downto 0)   <= Memory(addr_ind+3); 
+
+                elsif (MemWrite = '1') then -- Store data in address
+                    Memory(addr_ind)   <= dataIn(31 downto 24); -- MSB  
+                    Memory(addr_ind+1) <= dataIn(23 downto 16);  
+                    Memory(addr_ind+2) <= dataIn(15 downto 8);  
+                    Memory(addr_ind+3) <= dataIn(7 downto 0); --LSB 
                 end if;
+
             end if;
         end process;
 end architecture;
