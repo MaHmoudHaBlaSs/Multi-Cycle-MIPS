@@ -2,7 +2,6 @@ library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
-
 entity Memory is 
 	port (
         clk: in std_logic;
@@ -11,7 +10,6 @@ entity Memory is
         -- that work with 32-bit format.
         address : in std_logic_vector(31 downto 0);
         dataIn : in std_logic_vector(31 downto 0); -- Data to write [used only with "SW"]
-
         -- Control Signals
         MemWrite : in std_logic;
         MemRead : in std_logic;
@@ -24,17 +22,71 @@ end entity;
 -- Our Memory is a simple array of 2048 8-bits words [Byte]
 architecture Behavioral of Memory is
     type memArray is array(0 to 2047) of std_logic_vector(7 downto 0); -- Creating custom type
-
-	 signal Memory: memArray := (
-        0  => x"8C", 1  => x"05", 2  => x"00", 3  => x"00", -- lw $5, 0($0)
-        4  => x"8C", 5  => x"06", 6  => x"00", 7  => x"04", -- lw $6, 4($0)
-        8  => x"00", 9  => x"A6", 10 => x"38", 11 => x"20", -- add $7, $5, $6
-        12 => x"AC", 13 => x"07", 14 => x"00", 15 => x"08", -- sw $7, 8($0)
-        16 => x"08", 17 => x"00", 18 => x"00", 19 => x"00", -- j 0x00000000
-        others => (others => '0')
-    );
-
+    
+    -- Initialize memory with a function to ensure proper simulation behavior
+    function init_memory return memArray is
+        variable temp_mem : memArray := (others => (others => '0'));
+        
+        -- MIPS Instructions for c = a + b:
+        -- 1. lw $t0, 20($zero)   # Load a into $t0
+        -- 2. lw $t1, 24($zero)   # Load b into $t1
+        -- 3. add $t2, $t0, $t1   # $t2 = $t0 + $t1 (a + b)
+        -- 4. sw $t2, 28($zero)   # Store result in c
+    begin
+        -- Instruction 1: lw $t0, 20($zero) = x"8C080014"
+        temp_mem(0) := x"8C";  -- Most significant byte
+        temp_mem(1) := x"08";
+        temp_mem(2) := x"00";
+        temp_mem(3) := x"14";  -- Least significant byte
+        
+        -- Instruction 2: lw $t1, 24($zero) = x"8C090018"
+        temp_mem(4) := x"8C";
+        temp_mem(5) := x"09";
+        temp_mem(6) := x"00";
+        temp_mem(7) := x"18";
+        
+        -- Instruction 3: add $t2, $t0, $t1 = x"01095020"
+        temp_mem(8) := x"01";
+        temp_mem(9) := x"09";
+        temp_mem(10) := x"50";
+        temp_mem(11) := x"20";
+        
+        -- Instruction 4: sw $t2, 28($zero) = x"AC0A001C"
+        temp_mem(12) := x"AC";
+        temp_mem(13) := x"0A";
+        temp_mem(14) := x"00";
+        temp_mem(15) := x"1C";
+        
+        -- Data value for variable a = 10 (0x0000000A)
+        temp_mem(20) := x"00";
+        temp_mem(21) := x"00";
+        temp_mem(22) := x"00";
+        temp_mem(23) := x"0A";
+        
+        -- Data value for variable b = 15 (0x0000000F)
+        temp_mem(24) := x"00";
+        temp_mem(25) := x"00";
+        temp_mem(26) := x"00";
+        temp_mem(27) := x"0F";
+        
+        -- Location for variable c (will be filled with 25 (0x00000019) after execution)
+        temp_mem(28) := x"00";
+        temp_mem(29) := x"00";
+        temp_mem(30) := x"00";
+        temp_mem(31) := x"00";
+        
+        return temp_mem;
+    end function;
+    
+    -- Use the initialization function
+    signal Memory: memArray := init_memory;
+    
 begin
+    -- Memory organization:
+    -- Addresses 0-16: Instructions
+    -- Addresses 20-23: Variable a (value = 10)
+    -- Addresses 24-27: Variable b (value = 15)
+    -- Addresses 28-31: Variable c (will store a + b = 25)
 		
 	-- Clocked process (for writes only)
     process (clk)
@@ -49,8 +101,8 @@ begin
                 Memory(addr_ind+3) <= dataIn(7 downto 0); 
             end if;
         end if;
-    end process;
-
+    end process;  
+	
     -- Combinational read (immediate)
     process (MemRead, address)
         variable addr_ind : Integer; 

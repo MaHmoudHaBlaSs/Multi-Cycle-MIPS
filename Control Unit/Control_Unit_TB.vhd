@@ -71,7 +71,13 @@ begin
     
     stim_proc: process
     begin
-        -- Test R-type instruction (add, sub, etc.)	   #tested
+        
+	    -- Test beq instruction	        #tested
+        curr_opcode <= BEQ;
+        op <= get_opcode(BEQ);
+        wait for clk_period * 3.5;
+		
+		-- Test R-type instruction (add, sub, etc.)	   #tested
         curr_opcode <= R_TYPE;
         op <= get_opcode(R_TYPE);
         wait for clk_period * 4;
@@ -81,15 +87,10 @@ begin
         op <= get_opcode(LW);
         wait for clk_period * 5;
         
-        -- Test sw instruction
+        -- Test sw instruction		 #tested
         curr_opcode <= SW;
         op <= get_opcode(SW);
         wait for clk_period * 4;
-        
-        -- Test beq instruction
-        curr_opcode <= BEQ;
-        op <= get_opcode(BEQ);
-        wait for clk_period * 3;
         
         -- Test jump instruction       #tested
         curr_opcode <= JUMP;

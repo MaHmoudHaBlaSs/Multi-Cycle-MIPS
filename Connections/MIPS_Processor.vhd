@@ -127,7 +127,10 @@ begin
 	ALUOut_component :ALUOut 
 	port map( clk , alu_result , alu_out);
 	
-	
+	--RegisterAB
+	RegisterAB_component: RegisterAB
+    Port map ( clk , ReadData1 , ReadData2 , data_A , data_B); 
+
 	
 	-- MUXs
 	
@@ -170,7 +173,7 @@ begin
 	funct <= immediate(5 downto 0);
 	jump_part <= rs & rt & immediate;
 	
-	signExtend_out_shifted <= signExtend_out(29-0) & "00";
+	signExtend_out_shifted <= signExtend_out(29 downto 0) & "00";
 	jump_address <= pc_out(31 downto 28) & jump_part(25 downto 0 ) & "00"; 
 
 end Behavioral;

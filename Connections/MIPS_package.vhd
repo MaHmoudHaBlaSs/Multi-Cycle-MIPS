@@ -128,6 +128,7 @@ package MIPS_Package is
 		);
 	end component;
 	
+	--RegisterAB
 	component RegisterAB is
     Port (
         clk    : in STD_LOGIC;

@@ -13,7 +13,15 @@ end entity;
 
 architecture behav of Control_Unit is 
 type cycle is (FETCH, DECODE, EXECUTE, MEM_ACCESS, WRITE_BACK);
-signal curr_state : cycle := FETCH;
+signal curr_state : cycle := FETCH;	 
+
+constant R_TYPE :  std_logic_vector(5 downto 0) := "000000";   
+constant LW :  std_logic_vector(5 downto 0) := "100011"; 
+constant SW :  std_logic_vector(5 downto 0) := "101011"; 
+constant BEQ :  std_logic_vector(5 downto 0) := "000100"; 
+constant JUMP :  std_logic_vector(5 downto 0) := "000010"; 
+constant ADDI :  std_logic_vector(5 downto 0) := "001000"; 
+
 begin 
 	
 process(clk, op) is
@@ -42,19 +50,21 @@ begin
 				ALUOp <= "00";
 				PCWrite <= '1'; 
 				curr_state <= DECODE;
+			
 			when DECODE => 
 				ALUSrcA <= '0';
 				ALUSrcB <= "11";
 				ALUOp <= "00";
 				curr_state <= EXECUTE;
+			
 			when EXECUTE =>
 				case op is 
-					when "000010" =>  --jump 
+					when JUMP =>  --jump 
 						PCSource <= "10";
 						PCWrite <= '1';
 						curr_state <= FETCH;
 						
-					when "000100" =>  -- beq
+					when BEQ =>  -- beq
 						ALUSrcA <= '1';
 						ALUSrcB <= "00";
 						ALUOp <= "01";
@@ -62,13 +72,13 @@ begin
 						PCWriteCond <= '1';
 						curr_state <= FETCH;
 						
-					when "000000" =>  --R-type
+					when R_TYPE =>  --R-type
 						ALUSrcA <= '1';
 						ALUSrcB <= "00";
 						ALUOp <= "10";
 						curr_state <= MEM_ACCESS;
 		
-					when "100011" | "101011" | "001000" => --i-type						
+					when LW | SW | ADDI => --i-type						
 						ALUSrcA <= '1';
 						ALUSrcB <= "10";
 						ALUOp <= "00";
@@ -78,21 +88,21 @@ begin
 			
 			when MEM_ACCESS =>	
 				case (op) is 
-					when "000000" =>  	--R-type
+					when R_TYPE =>  	--R-type
 						RegDst  <= '1';
 						MemToReg <= '0';
 						RegWrite <= '1';
 						curr_state <= FETCH;
-					when "001000" =>  	--addi
+					when ADDI =>  	--addi
 						RegDst  <= '0';
 						MemToReg <= '0';
 						RegWrite <= '1';
 						curr_state <= FETCH;
-					when "101011" =>	--sw
+					when SW =>	--sw
 						IorD <= '1';
 						MemWrite <= '1';
 						curr_state <= FETCH;
-					when "100011" => 	--lw
+					when LW => 	--lw
 						IorD <= '1';
 						MemRead <= '1';
 						curr_state <= WRITE_BACK;
@@ -101,7 +111,7 @@ begin
 			
 			when WRITE_BACK =>	
 				case(op) is 
-					when "100011" => --lw
+					when LW => --lw
 						MemToReg <= '1'; 
 						RegDst <= '0'; 
 						Regwrite <= '1';
