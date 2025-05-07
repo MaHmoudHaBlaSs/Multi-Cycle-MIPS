@@ -1,27 +1,3 @@
--------------------------------------------------------------------------------
---
--- Title       : alu_control
--- Design      : ALU
--- Author      : Dell
--- Company     : student
---
--------------------------------------------------------------------------------
---
--- File        : C:/My_Designs/hardware/ALU/src/ALU.vhd
--- Generated   : Fri May  2 18:16:13 2025
--- From        : Interface description file
--- By          : ItfToHdl ver. 1.0
---
--------------------------------------------------------------------------------
---
--- Description : 
---
--------------------------------------------------------------------------------
-
---{{ Section below this comment is automatically maintained
---    and may be overwritten
---{entity {alu_control} architecture {Behavioral}}
-
 library IEEE;
 use IEEE.std_logic_1164.all;
 
@@ -32,8 +8,6 @@ entity alu_control is
 		ALUControl : out STD_LOGIC_VECTOR(2 downto 0)
 	);
 end alu_control;
-
---}} End of automatically maintained section
 
 architecture Behavioral of alu_control is
 begin

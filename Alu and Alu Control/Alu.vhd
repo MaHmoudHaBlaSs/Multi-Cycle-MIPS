@@ -1,27 +1,3 @@
--------------------------------------------------------------------------------
---
--- Title       : Alu_Block
--- Design      : ALU
--- Author      : Dell
--- Company     : student
---
--------------------------------------------------------------------------------
---
--- File        : C:/My_Designs/hardware/ALU/src/Alu_Block.vhd
--- Generated   : Fri May  2 19:13:57 2025
--- From        : Interface description file
--- By          : ItfToHdl ver. 1.0
---
--------------------------------------------------------------------------------
---
--- Description : 
---
--------------------------------------------------------------------------------
-
---{{ Section below this comment is automatically maintained
---    and may be overwritten
---{entity {Alu_Block} architecture {Behavioral}}
-
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;

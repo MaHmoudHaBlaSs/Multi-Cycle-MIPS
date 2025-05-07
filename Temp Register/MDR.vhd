@@ -3,26 +3,25 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 
-entity tempreg is
+entity MDR is
 	port (
-		clk,reset,enable: in std_logic;
+		clk : in std_logic;
 		reg_in   : in std_logic_vector(31 downto 0);
 		reg_out  : out std_logic_vector(31 downto 0)
 		);
 end entity;
 
-architecture reg of tempreg is
+architecture reg of MDR is
+signal temp : std_logic_vector(31 downto 0) := (others => '0');
 begin
 	process(clk)
 	begin
 		if(rising_edge(clk)) then
-			if(reset='1') then reg_out <=(others => '0');
-			elsif (enable ='1') then reg_out <= reg_in;
-			end if;
-			
+			temp <= reg_in;
 		end if;
 		
 	end process;
+	reg_out <= temp;
 	
 	
 end architecture ;
