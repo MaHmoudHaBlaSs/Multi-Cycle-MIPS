@@ -24,7 +24,7 @@ end entity;
 -- Our Memory is a simple array of 2048 8-bits words [Byte]
 architecture Behavioral of Memory is
     type memArray is array(0 to 2047) of std_logic_vector(7 downto 0); -- Creating custom type
-    --signal Memory: memArray := (others => (others => '0')); -- Creating an instance of that type
+
 	 signal Memory: memArray := (
         0  => x"8C", 1  => x"05", 2  => x"00", 3  => x"00", -- lw $5, 0($0)
         4  => x"8C", 5  => x"06", 6  => x"00", 7  => x"04", -- lw $6, 4($0)
